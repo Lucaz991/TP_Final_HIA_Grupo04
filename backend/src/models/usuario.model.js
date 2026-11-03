@@ -1,0 +1,26 @@
+const { DataTypes } = require('sequelize');
+const sequelize = require('../../config/database');
+
+const Usuario = sequelize.define('Usuario', {
+    // id automatico
+    rol: { type: DataTypes.ENUM('alumno','profesor','admin'), allowNull: false },
+    nombre: { type: DataTypes.STRING, allowNull: false },
+    apellido: { type: DataTypes.STRING, allowNull: true },
+    email: { type: DataTypes.STRING, allowNull:false, unique: true},
+    contraseniaHash: { type: DataTypes.STRING, allowNull: true }, 
+    genero: { type: DataTypes.ENUM('femenino', 'masculino'), allowNull: false },
+    estado: { type: DataTypes.ENUM('activo','inactivo'), allowNull: false },
+    proveedorAuth: { type: DataTypes.ENUM('local','Google'), allowNull: false},
+    foto: { type: DataTypes.STRING, allowNull: true },
+    ubicacion: { type: DataTypes.STRING, allowNull: true },
+    lat: { type: DataTypes.FLOAT, allowNull: true },
+    lng: { type: DataTypes.FLOAT, allowNull: true },
+    universidad: { type: DataTypes.STRING, allowNull: false},
+    carrera: { type: DataTypes.STRING, allowNull: false },
+    //descripcion: { type: DataTypes.STRING, allowNull: true }
+}, {
+    tableName: 'usuarios',
+    timestamps: true,
+});
+
+module.exports = Usuario;
