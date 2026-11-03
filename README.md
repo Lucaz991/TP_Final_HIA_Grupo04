@@ -1,4 +1,4 @@
-#  Proyecto Final HIA - Grupo 04
+#  Proyecto Final HIA - Grupo 13
 
 Repositorio unificado para el trabajo final de la materia Infraestructura (HIA). Este proyecto integra el frontend, backend y la base de datos en un único entorno orquestado.
 
