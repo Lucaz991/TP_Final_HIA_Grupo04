@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:18.6
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Completa el archivo .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Completa el archivo .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Completa el archivo .env}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - postgres18_data:/var/lib/postgresql
+    networks:
+      - redtpfinal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4:9.19
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:?Completa el archivo .env}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:?Completa el archivo .env}
+    ports:
+      - "127.0.0.1:5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - redtpfinal
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres18_data:
+  pgadmin_data:
+
+networks:
+  redtpfinal:
