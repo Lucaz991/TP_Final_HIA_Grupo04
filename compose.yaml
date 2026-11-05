@@ -1,4 +1,7 @@
 services:
+  # ==========================================
+  # 1. BASE DE DATOS Y ADMINISTRACIÓN (Versión segura de develop)
+  # ==========================================
   postgres:
     image: postgres:18.6
     environment:
@@ -32,9 +35,69 @@ services:
       postgres:
         condition: service_healthy
 
+  # ==========================================
+  # 2. SISTEMA DE MONITOREO (De main, adaptado a la nueva red)
+  # ==========================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    depends_on:
+      - node-exporter
+      - cadvisor
+      - postgres-exporter
+    networks:
+      - redtpfinal
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: always
+    ports:
+      - "9100:9100"
+    networks:
+      - redtpfinal
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - redtpfinal
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: postgres-exporter
+    restart: always
+    ports:
+      - "9187:9187"
+    environment:
+      # Corregido: sin contraseñas por defecto y apuntando a 'postgres'
+      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable"
+    depends_on:
+      - postgres
+    networks:
+      - redtpfinal
+
 volumes:
   postgres18_data:
   pgadmin_data:
+  prometheus_data:
 
 networks:
   redtpfinal:
